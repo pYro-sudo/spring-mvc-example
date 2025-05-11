@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .login-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="login-container">
+    <h2 class="text-center mb-4">Login</h2>
+    <form id="loginForm">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="username" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+    <div class="mt-3 text-center">
+      <p>Don't have an account? <a href="register.html">Register</a></p>
+    </div>
+    <div id="errorMessage" class="alert alert-danger mt-3 d-none"></div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const response = await fetch('/auth/generate-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        window.location.href = '../../static/menu.html';
+      } else {
+        const errorElement = document.getElementById('errorMessage');
+        errorElement.textContent = data.message || 'Login failed';
+        errorElement.classList.remove('d-none');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      const errorElement = document.getElementById('errorMessage');
+      errorElement.textContent = 'An error occurred during login';
+      errorElement.classList.remove('d-none');
+    }
+  });
+</script>
+</body>
+</html>
