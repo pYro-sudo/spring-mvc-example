@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Exercising Games Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <div class="d-flex justify-content-lg-end align-items-center mb-4">
+    <div>
+    </div>
+    <div>
+      <span class="me-3">Welcome, <span th:text="${username}"></span></span>
+      <a href="/static/menu.html" class="btn btn-outline-secondary me-2">
+        <i class="bi bi-arrow-left"></i> Back to Menu
+      </a>
+      <a href="../auth/login.html" class="btn btn-outline-danger">Logout</a>
+    </div>
+  </div>
+  <style>
+    .game-card {
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+    .game-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .task-highlight {
+      border-left: 4px solid #0d6efd;
+      background-color: #f8f9fa;
+    }
+  </style>
+</head>
+<body>
+<div class="container py-4">
+  <!-- Header with Search -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-joystick"></i> Exercising Games</h1>
+    <div>
+      <form th:action="@{/exercising-games/by-task}" method="get" class="d-flex">
+        <input type="text" name="task" class="form-control me-2" placeholder="Search tasks...">
+        <button type="submit" class="btn btn-outline-primary">
+          <i class="bi bi-search"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Game Form (Collapsible) -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+         data-bs-toggle="collapse" href="#createForm">
+      <h5 class="mb-0">Create New Game</h5>
+      <i class="bi bi-chevron-down"></i>
+    </div>
+    <div class="collapse" id="createForm">
+      <div class="card-body">
+        <form th:action="@{/exercising-games/create}" method="post">
+          <div class="mb-3">
+            <label class="form-label">Game Task</label>
+            <input type="text" class="form-control" name="task" required>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Games List with Dynamic Content -->
+  <div th:if="${param.task != null}" class="alert alert-info mb-3">
+    Showing results for: "<span th:text="${param.task}"></span>"
+    <a href="dashboard.html" class="float-end">Clear search</a>
+  </div>
+
+  <div th:if="${exercising-games != null and !exercising-games.empty}">
+    <div class="row">
+      <div th:each="game : ${exercising-games}" class="col-md-6 col-lg-4">
+        <div class="game-card card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Game #<span th:text="${game.id}"></span></h5>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                      type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <form th:action="@{'/exercising-games/delete/' + ${game.id}}" method="post">
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="task-highlight p-3 mb-3" th:text="${game.task}"></div>
+            <div class="d-flex gap-2">
+              <form th:action="@{/exercising-games/by-task}" method="get" class="flex-grow-1">
+                <input type="hidden" name="task" th:value="${game.task}">
+                <button type="submit" class="btn btn-sm btn-outline-primary w-100">
+                  <i class="bi bi-search"></i> Similar
+                </button>
+              </form>
+              <form th:action="@{/exercising-games/delete/by-task}" method="post" class="flex-grow-1">
+                <input type="hidden" name="task" th:value="${game.task}">
+                <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                  <i class="bi bi-trash"></i> All
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div th:if="${exercising-games == null or exercising-games.empty}" class="alert alert-info">
+    No games found. Create your first game above.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Delete confirmations
+    document.querySelectorAll('form[action*="/delete"]').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        if (!confirm('Are you sure you want to delete this?')) {
+          e.preventDefault();
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
