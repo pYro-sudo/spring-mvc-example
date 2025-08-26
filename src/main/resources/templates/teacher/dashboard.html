@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    .teacher-card {
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+    .teacher-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .action-buttons {
+      margin-top: 15px;
+    }
+    .teacher-icon {
+      font-size: 1.5rem;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-person-video3 teacher-icon"></i> Teacher Management</h1>
+    <div>
+      <span class="me-3">Welcome, <span th:text="${username}"></span></span>
+      <a href="/static/menu.html" class="btn btn-outline-secondary me-2">Back to Menu</a>
+      <a href="../auth/login.html" class="btn btn-outline-danger" onclick="logout(event)">Logout</a>
+    </div>
+  </div>
+
+  <!-- Add Teacher Card -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Register New Teacher</h5>
+    </div>
+    <div class="card-body">
+      <form th:action="@{/teacher/add}" method="post" th:object="${teacher}">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="name" class="form-label">Teacher Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="name"
+                     th:field="*{name}" required
+                     placeholder="Enter teacher's full name">
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-person-plus"></i> Register Teacher
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Teachers List -->
+  <h3 class="mb-3">Registered Teachers</h3>
+  <div th:if="${teachers != null and !teachers.empty}">
+    <div class="row">
+      <div th:each="teacher : ${teachers}" class="col-md-6">
+        <div th:replace="~{teacher/fragments/teacher-card :: card(${teacher})}"></div>
+      </div>
+    </div>
+  </div>
+  <div th:if="${teachers == null or teachers.empty}" class="alert alert-info">
+    No teachers found. Register a new teacher using the form above.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+  function logout(e) {
+    e.preventDefault();
+    window.location.replace("auth/login.html");
+  }
+</script>
+</body>
+</html>
